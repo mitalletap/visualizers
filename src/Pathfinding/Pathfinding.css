@@ -1,0 +1,19 @@
+.grid {
+    padding-top: 10px;
+}
+
+.col {
+
+    display: inline-grid;
+}
+
+
+.site-header {
+    color: #B0E0E6;
+}
+
+.logo {
+    color: #B0E0E6;
+    padding-top: 10px;
+    padding-bottom: 50px;
+}
