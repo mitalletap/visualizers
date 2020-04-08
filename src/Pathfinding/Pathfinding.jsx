@@ -34,7 +34,6 @@ class Pathfinding extends Component {
             maxRows: 27,  //27
             activeMaze: false,
             activeAlgorithm: false,
-            active: false,
             pathFound: false,
             simulationComplete: false,
             collapsed: false,
@@ -123,12 +122,13 @@ class Pathfinding extends Component {
     }
 
     handleMouseEnter(col, row) {
-        const { grid, mouseDown, holdingStart, holdingEnd, startCol, startRow, endRow, endCol, destroyingWall } = this.state;
+        const { grid, mouseDown, holdingStart, holdingEnd, startCol, startRow, endRow, endCol, destroyingWall, previousEndCol, previousEndRow, previousStartCol, previousStartRow } = this.state;
         var current = this.getCell(grid, col, row);
 
 
         if(mouseDown === true && holdingStart === true) {
             document.getElementById(`cell-${this.state.startCol}-${this.state.startRow}`).classList.remove('cell-start');
+            grid[previousStartCol][previousStartRow].startCell = false;
             this.setState({ startRow: current.row, startCol: current.col })
             this.setState({ previousStartCol: startCol, previousStartRow: startRow })
             document.getElementById(`cell-${current.col}-${current.row}`).classList.add('cell-start');
@@ -137,6 +137,7 @@ class Pathfinding extends Component {
 
         }else if(mouseDown === true && holdingEnd === true){
             document.getElementById(`cell-${this.state.endCol}-${this.state.endRow}`).classList.remove('cell-end');
+            grid[previousStartCol][previousStartRow].startCell = false;
             this.setState({ endRow: current.row, endCol: current.col })
             this.setState({ previousEndCol: endCol, previousEndRow: endRow })
             document.getElementById(`cell-${current.col}-${current.row}`).classList.add('cell-end');
@@ -161,6 +162,7 @@ class Pathfinding extends Component {
         }
         
     }
+    
 
     // When the mouse click has been released, it will set the "MOUSE PRESS" state back to its default
     handleMouseUp(col, row) {
@@ -168,7 +170,9 @@ class Pathfinding extends Component {
         var current = this.getCell(grid, col, row)
 
         if(holdingStart === true) {
+            current.startCell = true;
         } else if(holdingEnd === true) {
+            current.endCell = true;
         } else if(mouseDown === true) {
             if(current.startCell === true) {
                 console.log("You have entered the start")
@@ -183,47 +187,39 @@ class Pathfinding extends Component {
             }
         }
         this.setState({ mouseDown: false, mouseUp: true, holdingEnd: false, holdingStart: false, destroyingWall: false })
+        console.log(startCol, startRow)
+        console.log(previousStartCol, previousStartRow)
     }
     
-    handleClearPath(grid){
-        if(this.state.active === false){
-            this.setState({ activeAlgorithm: false })
-            const newGrid = [];
-            for (let row = 0; row < this.state.maxRows; row++){
-                const currentRow = [];
-                for (let col = 0; col < this.state.maxCols; col++){
-                    const cell = grid[row][col];
-                    document.getElementById(`cell-${cell.row}-${cell.col}`).classList.remove('cell-shortest-path'); 
-                    document.getElementById(`cell-${cell.row}-${cell.col}`).classList.remove('cell-visited'); 
-                    currentRow.push(cell);
-                }
-                newGrid.push(currentRow);
-            }
-            this.setState({ grid: newGrid, pathFound: false })
-        } else {
-            console.log("Please Wait")
-        }
-    }
 
 
     handleClearBoard() {
-        console.log("Clearing Board!")
-        this.setState({ mouseDown: false, mouseUp: true, holdingStart: false, holdingEnd: false, buildingWall: false });
-        console.log(this.state.maxCols, this.state.maxRows)
-        var newGrid = [];
-        for(var col = 0; col < this.state.maxCols; col++){
-            var currentCol = []
-            for(var row = 0; row < this.state.maxRows; row++){
-                var cell = this.getCell(this.state.grid, col, row);
-                if(cell.wall === true){
+        const { grid, startCol, endCol, startRow, endRow } = this.state;
+        if(this.state.activeAlgorithm === false || this.state.activeMaze === false) {
+            var newGrid = [];
+            for(var col = 0; col < this.state.maxCols; col++){
+                var currentCol = []
+                for(var row = 0; row < this.state.maxRows; row++){
+                    var cell = this.getCell(this.state.grid, col, row);
                     cell.wall = false;
+                    cell.visited = false;
+                    cell.startCell = false;
+                    cell.endCell = false;
                     document.getElementById(`cell-${cell.col}-${cell.row}`).className="cell ";
+                    if(cell.col === startCol && cell.row === startRow){
+                        cell.startCell = true;
+                        document.getElementById(`cell-${cell.col}-${cell.row}`).className="cell cell-start";
+                    } else if(cell.col === endCol && cell.row === endRow) {
+                        cell.endCell = true;
+                        document.getElementById(`cell-${cell.col}-${cell.row}`).className="cell cell-end";
+                    }
+                    currentCol.push(cell);
                 }
-                currentCol.push(cell);
+                newGrid.push(currentCol);
             }
-            newGrid.push(currentCol);
+            this.setState({ grid: newGrid, mouseDown: false, mouseUp: true, holdingStart: false, holdingEnd: false, buildingWall: false, activeAlgorithm: false, activeMaze: false, selectedAlgorithm: "", selectedMaze: "", simulationComplete: false });
         }
-        this.setState({grid: newGrid});
+        console.log(grid[1][1])
     }
 
     drawBorders(col, row){
@@ -270,14 +266,19 @@ class Pathfinding extends Component {
 
     // Switch case to vizualize multiple algorithms
     visualizeAlgorithm(algorithm) {
+        console.log(`${algorithm} selected`)
         const { grid, startRow, startCol, endRow, endCol, maxCols, maxRows } = this.state;
         const start = grid[startRow][startCol];
         const end = grid[endRow][endCol];
-        var visited;
+        var visited = [];
+        var shortestPath;
+        console.log(start)
+        console.log(end)
         switch(algorithm){
             case 'Dijkstra':
                 visited = dijkstra(grid, start, end);
-                const shortestPath = getShortestPath(end);
+                console.log(visited)
+                shortestPath = getShortestPath(end);
                 this.animateDijkstra(visited, shortestPath);
                 break;
             // case 'AStar':
@@ -287,10 +288,10 @@ class Pathfinding extends Component {
                 console.log("Algorithm Not Found");
                 break;
         }
-
     }    
     
     visualizeMaze(maze) {
+        console.log(`${maze} selected`)
         const { grid, maxRows, maxCols } = this.state;
         const visited = this.drawBorders(maxCols, maxRows);
         var newVisited;
@@ -312,10 +313,8 @@ class Pathfinding extends Component {
         var waitTime = this.animateMaze(visited.concat(newVisited));
         setTimeout(() => {
             newGrid = this.setWall(grid, visited);
-            console.log(newGrid)
             this.setState({ grid: newGrid })
-            console.log(this.state.grid)
-            console.log("State set")
+            this.setState({ activeMaze: false })
         }, 10 * waitTime);
 
     }
@@ -342,7 +341,7 @@ class Pathfinding extends Component {
             if(i === visited.length) {
                 setTimeout(() => {
                     this.animateShortestPath(shortestPath);
-                    this.setState({ active: false })
+                    this.setState({ activeAlgorithm: false })
                 }, 10 * i);
                 return;
             }
@@ -367,17 +366,13 @@ class Pathfinding extends Component {
         console.log("animated!")
         return i;
     }
-
-
-
-
-
+b
     onCollapse = collapsed => {
         this.setState({ collapsed });
     };
 
     render() { 
-        const { grid } = this.state;
+        const { grid, printDetails } = this.state;
         const min = 1;
         return ( 
 
@@ -401,9 +396,22 @@ class Pathfinding extends Component {
                                         <Menu.Item key="7" onClick={() => this.setState({ selectedMaze: 'Recursive Backtracking' })}> Recursive Backtracking </Menu.Item>
                                     </SubMenu>
                                 </SubMenu>
-                                <Menu.Item key="8" disabled={this.state.selectedAlgorithm === "" || this.state.activeAlgorithm === true} onClick={() => { this.visualizeAlgorithm(this.state.selectedAlgorithm); this.setState({ activeAlgorithm: true })}}><ClearOutlined /> <span> {this.state.selectedAlgorithm === "" ? "Choose an Algorithm" : `Simulate ${this.state.selectedAlgorithm}` } </span></Menu.Item>
-                                <Menu.Item key="9" disabled={this.state.selectedMaze === "" || this.state.activeMaze === true} onClick={() => { this.visualizeMaze(this.state.selectedMaze); this.setState({ activeMaze: true })}}><ClearOutlined /> <span> {this.state.selectedMaze === "" ? "Choose an Maze" : `Simulate ${this.state.selectedMaze}` } </span></Menu.Item>
-                                <Menu.Item key="10" onClick={() => this.handleClearBoard()}><ClearOutlined /> <span> Clear Board </span></Menu.Item>
+
+                                <Menu.Item key="8" 
+                                    disabled={this.state.selectedAlgorithm === "" || this.state.activeAlgorithm === true || this.state.activeMaze === true } onClick={() => { this.setState({ activeAlgorithm: true}); this.visualizeAlgorithm(this.state.selectedAlgorithm)}}>
+                                    <ClearOutlined /> <span> {this.state.selectedAlgorithm === "" ? "Choose an Algorithm" : `Simulate ${this.state.selectedAlgorithm}` } </span>
+                                </Menu.Item>
+
+                                <Menu.Item key="9" 
+                                    disabled={this.state.selectedMaze === "" || this.state.activeMaze === true} onClick={() => { this.setState({ activeMaze: true }); this.visualizeMaze(this.state.selectedMaze) }}>
+                                    <ClearOutlined /> <span> {this.state.selectedMaze === "" ? "Choose an Maze" : `Simulate ${this.state.selectedMaze}` } </span>
+                                </Menu.Item>
+
+                                <Menu.Item key="10" 
+                                    disabled={this.state.activeAlgorithm === true || this.state.activeMaze === true} onClick={() => {this.handleClearBoard(); 
+                                        console.log(`Active Algorithm: ${this.state.activeAlgorithm}, Active Maze: ${this.state.activeMaze}, Selected Algorithm: ${this.state.selectedAlgorithm}, Selected Maze: ${this.state.selectedMaze}, reset`)}}><ClearOutlined /> <span> Reset </span>
+                                </Menu.Item>
+
                             </Menu>
                         </Sider>
                         <Content style={{ paddingTop: "10px"}}>
