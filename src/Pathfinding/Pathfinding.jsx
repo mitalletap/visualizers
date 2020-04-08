@@ -84,7 +84,6 @@ class Pathfinding extends Component {
     }
 
     setWall = (grid, walls) => {
-        console.log(walls)
         var x = 0; 
         while(x < walls.length){
             for(var col = 0; col < this.state.maxCols; col++){
@@ -128,7 +127,6 @@ class Pathfinding extends Component {
 
         if(mouseDown === true && holdingStart === true) {
             document.getElementById(`cell-${this.state.startCol}-${this.state.startRow}`).classList.remove('cell-start');
-            grid[previousStartCol][previousStartRow].startCell = false;
             this.setState({ startRow: current.row, startCol: current.col })
             this.setState({ previousStartCol: startCol, previousStartRow: startRow })
             document.getElementById(`cell-${current.col}-${current.row}`).classList.add('cell-start');
@@ -137,7 +135,6 @@ class Pathfinding extends Component {
 
         }else if(mouseDown === true && holdingEnd === true){
             document.getElementById(`cell-${this.state.endCol}-${this.state.endRow}`).classList.remove('cell-end');
-            grid[previousStartCol][previousStartRow].startCell = false;
             this.setState({ endRow: current.row, endCol: current.col })
             this.setState({ previousEndCol: endCol, previousEndRow: endRow })
             document.getElementById(`cell-${current.col}-${current.row}`).classList.add('cell-end');
@@ -163,16 +160,14 @@ class Pathfinding extends Component {
         
     }
     
-
     // When the mouse click has been released, it will set the "MOUSE PRESS" state back to its default
     handleMouseUp(col, row) {
         const { grid, mouseDown, holdingStart, holdingEnd, previousStartCol, previousStartRow, startCol, startRow, destroyingWall } = this.state;
         var current = this.getCell(grid, col, row)
 
         if(holdingStart === true) {
-            current.startCell = true;
+            this.setState({ startCol: row, startRow: col })
         } else if(holdingEnd === true) {
-            current.endCell = true;
         } else if(mouseDown === true) {
             if(current.startCell === true) {
                 console.log("You have entered the start")
@@ -180,19 +175,16 @@ class Pathfinding extends Component {
                 console.log("You have entered the end")
             } else if(destroyingWall === true){
                 document.getElementById(`cell-${current.col}-${current.row}`).classList.remove('cell-wall');
-                current.wall = false;
+                grid[col][row].wall = false;
             } else {
                 document.getElementById(`cell-${current.col}-${current.row}`).className="cell cell-wall";
-                current.wall = true;
+                grid[col][row].wall = true;
             }
         }
         this.setState({ mouseDown: false, mouseUp: true, holdingEnd: false, holdingStart: false, destroyingWall: false })
-        console.log(startCol, startRow)
-        console.log(previousStartCol, previousStartRow)
+        this.updateGrid();
     }
     
-
-
     handleClearBoard() {
         const { grid, startCol, endCol, startRow, endRow } = this.state;
         if(this.state.activeAlgorithm === false || this.state.activeMaze === false) {
@@ -219,7 +211,6 @@ class Pathfinding extends Component {
             }
             this.setState({ grid: newGrid, mouseDown: false, mouseUp: true, holdingStart: false, holdingEnd: false, buildingWall: false, activeAlgorithm: false, activeMaze: false, selectedAlgorithm: "", selectedMaze: "", simulationComplete: false });
         }
-        console.log(grid[1][1])
     }
 
     drawBorders(col, row){
@@ -264,20 +255,35 @@ class Pathfinding extends Component {
         return mazeWalls;
     }
 
+    updateGrid(){
+        const { grid } = this.state;
+        var newGrid = [];
+        for(var col = 0; col < this.state.maxCols; col++){
+            var currentCol = [];
+            for(var row = 0; row < this.state.maxRows; row++){
+                var cell = this.createCell(row, col);
+                if(grid[col][row].wall === true) {
+                    cell.wall = true;
+                }
+                currentCol.push(cell);
+            }
+            newGrid.push(currentCol);
+        }
+
+        this.setState({ grid: newGrid })
+    }
+
     // Switch case to vizualize multiple algorithms
     visualizeAlgorithm(algorithm) {
-        console.log(`${algorithm} selected`)
-        const { grid, startRow, startCol, endRow, endCol, maxCols, maxRows } = this.state;
-        const start = grid[startRow][startCol];
-        const end = grid[endRow][endCol];
+        // this.updateGrid();
+        const { grid, startRow, startCol, endRow, endCol } = this.state;
+        var start = grid[startRow][startCol];
+        var end = grid[endRow][endCol];
         var visited = [];
         var shortestPath;
-        console.log(start)
-        console.log(end)
         switch(algorithm){
             case 'Dijkstra':
                 visited = dijkstra(grid, start, end);
-                console.log(visited)
                 shortestPath = getShortestPath(end);
                 this.animateDijkstra(visited, shortestPath);
                 break;
@@ -408,10 +414,8 @@ b
                                 </Menu.Item>
 
                                 <Menu.Item key="10" 
-                                    disabled={this.state.activeAlgorithm === true || this.state.activeMaze === true} onClick={() => {this.handleClearBoard(); 
-                                        console.log(`Active Algorithm: ${this.state.activeAlgorithm}, Active Maze: ${this.state.activeMaze}, Selected Algorithm: ${this.state.selectedAlgorithm}, Selected Maze: ${this.state.selectedMaze}, reset`)}}><ClearOutlined /> <span> Reset </span>
+                                    disabled={this.state.activeAlgorithm === true || this.state.activeMaze === true} onClick={() => {this.handleClearBoard() }}><ClearOutlined /> <span> Reset </span>
                                 </Menu.Item>
-
                             </Menu>
                         </Sider>
                         <Content style={{ paddingTop: "10px"}}>
