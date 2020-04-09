@@ -1,6 +1,7 @@
 
 export function dijkstra(grid, start, end){
     const visited = [];
+    var start = getStart(grid);
     start.distance = 0;
     const unvisited = getAllNodes(grid);
 
@@ -85,4 +86,17 @@ export function getShortestPath(end) {
         } 
     }
     return pathOrder;
+}
+
+
+function getStart(grid) {
+    var start;
+    for(var col = 0; col < grid.length; col++){
+        for(var row = 0; row < grid[0].length; row++){
+            if(grid[col][row].startCell === true){
+                start = grid[col][row];
+            }
+        }
+    }
+    return start;
 }

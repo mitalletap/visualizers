@@ -7,9 +7,9 @@ class Cell extends Component {
         const classIdentifier = endCell ? 'cell-end' : startCell ? 'cell-start' : wall ? 'cell-wall' : '';
         return ( 
             <div
-                draggable={false}
                 className={`cell ${classIdentifier}`}
                 id={`cell-${row}-${col}`}
+                wall={wall}
                 onMouseDown={() => onMouseDown(col, row)}
                 onMouseEnter={() => onMouseEnter(col, row)}
                 onMouseUp={() => onMouseUp(col, row)}
