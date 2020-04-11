@@ -1,15 +1,18 @@
 import './Pathfinding.css'
+import 'antd/dist/antd.css';
 import React, { Component } from 'react';
 import Cell from '../Cells/Cell';
-import 'antd/dist/antd.css';
+
 import { NodeIndexOutlined, NodeExpandOutlined, ClearOutlined, SmileOutlined } from '@ant-design/icons';
-import { Layout, Menu, Button } from 'antd';
+import { Layout, Menu, Button, Divider, Typography, Modal } from 'antd';
 import { dijkstra, getShortestPath } from './Algorithms/Dijkstra'
+import { astar } from './Algorithms/AStar'
 import { recursiveDivisionMaze } from './Mazes/RecusiveDivision'
 import { recursiveDivisionRandomizerMaze } from './Mazes/RecursiveDivisionRandomizer'
 import { smilyFaceMaze } from './Mazes/Patterns'
 import { wait } from '@testing-library/react';
 
+const { Text } = Typography;
 const { SubMenu } = Menu;
 const { Header, Footer, Sider, Content } = Layout;
 class Pathfinding extends Component {
@@ -30,7 +33,7 @@ class Pathfinding extends Component {
             mouseHold: false,
             holdingStart: false,
             holdingEnd: false,
-            maxCols: 47, //47
+            maxCols: 45, //47
             maxRows: 27,  //27
             activeMaze: false,
             activeAlgorithm: false,
@@ -40,6 +43,7 @@ class Pathfinding extends Component {
             selectedAlgorithm: "",
             selectedMaze: "",
             destroyingWall: false,
+            visibelModal: true
         }
     }
 
@@ -47,6 +51,12 @@ class Pathfinding extends Component {
         const grid = this.createGrid();
         this.setState({ grid: grid });
     }
+
+    handleOk = e => {
+        this.setState({
+          visibelModal: false,
+        });
+    };
 
     createGrid = () => {
         const grid = [];
@@ -90,7 +100,6 @@ class Pathfinding extends Component {
                 for(var row = 0; row < this.state.maxRows; row++){
                     if(walls[x].row === grid[col][row] && walls[x].col === grid[col][row] ){
                         grid[col][row].wall = true;
-                        console.log(`Wall at ${grid[col][row]}`)
                     }
                 }
             }
@@ -142,19 +151,15 @@ class Pathfinding extends Component {
 
         } else if(mouseDown === true) {
             if(current.col === startCol && current.row === startRow) {
-                console.log("You have entered the start")
             } else if(current.col === endCol && current.row === endRow) {
-                console.log("You have entered the end")
             } else if(destroyingWall === true){
                 if(current.wall === true) {
                     document.getElementById(`cell-${current.col}-${current.row}`).classList.remove('cell-wall');
                     current.wall = false;
-                    console.log("Removing Wall")
                 }
             } else {
                 document.getElementById(`cell-${current.col}-${current.row}`).className="cell cell-wall";
                 current.wall = true;
-                console.log("Adding Wall")
             }
         }
         
@@ -170,9 +175,7 @@ class Pathfinding extends Component {
         } else if(holdingEnd === true) {
         } else if(mouseDown === true) {
             if(current.startCell === true) {
-                console.log("You have entered the start")
             } else if(current.endCell === true) {
-                console.log("You have entered the end")
             } else if(destroyingWall === true){
                 document.getElementById(`cell-${current.col}-${current.row}`).classList.remove('cell-wall');
                 grid[col][row].wall = false;
@@ -287,9 +290,10 @@ class Pathfinding extends Component {
                 shortestPath = getShortestPath(end);
                 this.animateDijkstra(visited, shortestPath);
                 break;
-            // case 'AStar':
-            //     astar(grid, start, end);
-            //     break;
+            case 'AStar':
+                visited = astar(grid, start, end);
+                this.animateShortestPath(visited);
+                break;
             default:
                 console.log("Algorithm Not Found");
                 break;
@@ -297,7 +301,6 @@ class Pathfinding extends Component {
     }    
     
     visualizeMaze(maze) {
-        console.log(`${maze} selected`)
         const { grid, maxRows, maxCols } = this.state;
         const visited = this.drawBorders(maxCols, maxRows);
         var newVisited;
@@ -318,7 +321,7 @@ class Pathfinding extends Component {
         // var waitTime = 
         var waitTime = this.animateMaze(visited.concat(newVisited));
         setTimeout(() => {
-            newGrid = this.setWall(grid, visited);
+            newGrid = this.setWall(grid, visited.concat(newVisited));
             this.setState({ grid: newGrid })
             this.setState({ activeMaze: false })
         }, 10 * waitTime);
@@ -338,7 +341,7 @@ class Pathfinding extends Component {
         if(endCell !== undefined){ 
             this.setState({ pathFound: true });
         }
-        this.setState({ simulationComplete: true })
+        this.setState({ simulationComplete: true, activeAlgorithm: false })
     }
 
     // Animates all every "CELL" that is not apart of the shortest path, the start, or the end
@@ -347,7 +350,6 @@ class Pathfinding extends Component {
             if(i === visited.length) {
                 setTimeout(() => {
                     this.animateShortestPath(shortestPath);
-                    this.setState({ activeAlgorithm: false })
                 }, 10 * i);
                 return;
             }
@@ -369,7 +371,6 @@ class Pathfinding extends Component {
                 }, 10 * i);
             }
         }
-        console.log("animated!")
         return i;
     }
 b
@@ -378,44 +379,57 @@ b
     };
 
     render() { 
-        const { grid, printDetails } = this.state;
-        const min = 1;
+        const { grid } = this.state;
         return ( 
 
-            
             <React.Fragment>
+                <Modal
+                    title="Welcome to the Pathfinding Visualizer!"
+                    visible={this.state.visibelModal}
+                    onOk={this.handleOk}
+                    onCancel={this.handleOk}
+                >
+                    <p>It is the MVP of this visualizer, so try it out! I plan to incorporate more features and algorithms in the future.</p>
+                    <p>Simply drag and drop the starting and ending nodes, select the algorithm on the left, and click "Simulate"! 
+                        You can also draw on the canvas to create and destroy obstructions!</p>
+                </Modal>
                  <Layout style={{ minHeight: '100vh' }}>
-                    <Header> <h1 className="site-header">PATHFINDING VISUALIZER</h1></Header>
+                    {/* <Header> <h1 className="site-header">PATHFINDING VISUALIZER</h1></Header> */}
                     <Layout>
                         <Sider width={"15vw"} collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
-                            <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-                                <SubMenu key="sub1" title={<React.Fragment> <NodeIndexOutlined /> <span> Pathfinding </span></React.Fragment>}>
+                            <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" defaultSelectedKeys={[]}>
+                                {/* <SubMenu key="sub1" title={<React.Fragment> <NodeIndexOutlined /> <span> Pathfinding </span></React.Fragment>}> */}
+                                    <Divider type="horizontal" />
                                     <Menu.Item key="1" onClick={() => this.setState({ selectedAlgorithm: 'Dijkstra' })}> Dijkstra </Menu.Item>
-                                    <Menu.Item key="2" onClick={() => this.setState({ selectedAlgorithm: 'Dijkstra' })}> A* </Menu.Item>
-                                    <Menu.Item key="3"> Other</Menu.Item>
-                                </SubMenu>
-                                <SubMenu key="sub2" title={<React.Fragment> <NodeExpandOutlined /> <span> Maze </span> </React.Fragment>}>
+                                    {/* <Menu.Item key="2" onClick={() => this.setState({ selectedAlgorithm: 'AStar' })}> A* </Menu.Item>
+                                    <Menu.Item key="3"> Other</Menu.Item> */}
+                                    <Divider type="horizontal" />
+                                {/* </SubMenu> */}
+                                {/* <SubMenu key="sub2" title={<React.Fragment> <NodeExpandOutlined /> <span> Maze </span> </React.Fragment>}>
                                     <Menu.Item key="4" onClick={() => this.setState({ selectedMaze: 'Recursive Division' })}> Recursive Division </Menu.Item>
                                     <Menu.Item key="5" onClick={() => this.setState({ selectedMaze: 'Recursive Backtracking' })}> Recursive Backtracking </Menu.Item>
-                                    <SubMenu key="sub3" title={<React.Fragment> <SmileOutlined /> <span> Randomize </span> </React.Fragment>}>
+                                        <SubMenu key="sub3" title={<React.Fragment> <SmileOutlined /> <span> Randomize </span> </React.Fragment>}>
                                         <Menu.Item key="6" onClick={() => this.setState({ selectedMaze: 'Smily' })}> Smily Face </Menu.Item>
                                         <Menu.Item key="7" onClick={() => this.setState({ selectedMaze: 'Recursive Backtracking' })}> Recursive Backtracking </Menu.Item>
                                     </SubMenu>
-                                </SubMenu>
+                                </SubMenu> 
+                                <Divider type="horizontal" /> */}
 
                                 <Menu.Item key="8" 
                                     disabled={this.state.selectedAlgorithm === "" || this.state.activeAlgorithm === true || this.state.activeMaze === true } onClick={() => { this.setState({ activeAlgorithm: true}); this.visualizeAlgorithm(this.state.selectedAlgorithm)}}>
                                     <ClearOutlined /> <span> {this.state.selectedAlgorithm === "" ? "Choose an Algorithm" : `Simulate ${this.state.selectedAlgorithm}` } </span>
                                 </Menu.Item>
 
-                                <Menu.Item key="9" 
+                                {/* <Menu.Item key="9" 
                                     disabled={this.state.selectedMaze === "" || this.state.activeMaze === true} onClick={() => { this.setState({ activeMaze: true }); this.visualizeMaze(this.state.selectedMaze) }}>
                                     <ClearOutlined /> <span> {this.state.selectedMaze === "" ? "Choose an Maze" : `Simulate ${this.state.selectedMaze}` } </span>
-                                </Menu.Item>
+                                </Menu.Item> */}
 
                                 <Menu.Item key="10" 
                                     disabled={this.state.activeAlgorithm === true || this.state.activeMaze === true} onClick={() => {this.handleClearBoard() }}><ClearOutlined /> <span> Reset </span>
                                 </Menu.Item>
+
+                                <Divider type="horizontal" />
                             </Menu>
                         </Sider>
                         <Content style={{ paddingTop: "10px"}}>
@@ -456,12 +470,6 @@ b
     }
 }
 
-
-
-
-
-
- 
 export default Pathfinding;
 
 
