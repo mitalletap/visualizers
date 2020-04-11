@@ -45,6 +45,7 @@ class Pathfinding extends Component {
             destroyingWall: false,
             visibelModal: true
         }
+        this.createGrid = this.createGrid.bind(this)
     }
 
     componentDidMount() {
