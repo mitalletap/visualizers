@@ -1,0 +1,16 @@
+.node {
+    width: 50px;
+    height: 25px;
+    margin: 3px;
+    outline: .2px solid grey;
+    display: block;
+    font-size: 15px;
+}
+
+.node-current {
+    background-color: #00BFD2;
+}
+
+.node-visited  {
+    background-color: #E2A131;
+}

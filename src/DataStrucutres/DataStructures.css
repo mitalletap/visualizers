@@ -1,0 +1,26 @@
+.stack {
+    position: absolute;
+    display: grid;
+    top: 10%;
+    left: 35%;
+    /* transform: translate(-50%, -50%); */
+}
+
+.user-input {
+    margin: 0;
+    width: 650px;
+    position: absolute;
+    top: 50%;
+    left: 65%;
+    transform: translate(-50%, -50%);
+}
+
+.information {
+    margin: 0;
+    position: absolute;
+    top: 30%;
+    left: 65%;
+    transform: translate(-50%, -50%);
+    background-color: aquamarine;
+    display: inline-flex;
+}

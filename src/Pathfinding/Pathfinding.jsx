@@ -1,8 +1,10 @@
 import './Pathfinding.css'
 import 'antd/dist/antd.css';
-import React, { Component } from 'react';
-import Cell from '../Cells/Cell';
 
+import React, { Component } from 'react';
+import Cell from './Cells/Cell'
+
+import { wait } from '@testing-library/react';
 import { NodeIndexOutlined, NodeExpandOutlined, ClearOutlined, SmileOutlined } from '@ant-design/icons';
 import { Layout, Menu, Button, Divider, Typography, Modal } from 'antd';
 import { dijkstra, getShortestPath } from './Algorithms/Dijkstra'
@@ -10,11 +12,11 @@ import { astar } from './Algorithms/AStar'
 import { recursiveDivisionMaze } from './Mazes/RecusiveDivision'
 import { recursiveDivisionRandomizerMaze } from './Mazes/RecursiveDivisionRandomizer'
 import { smilyFaceMaze } from './Mazes/Patterns'
-import { wait } from '@testing-library/react';
 
 const { Text } = Typography;
 const { SubMenu } = Menu;
 const { Header, Footer, Sider, Content } = Layout;
+
 class Pathfinding extends Component {
     constructor(props) {
         super(props);

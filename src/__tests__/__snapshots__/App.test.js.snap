@@ -97,9 +97,7 @@ exports[`testing app.js snapshot tests the main application 1`] = `
       <Route
         path="/data-structures"
       >
-        <h1>
-           structures 
-        </h1>
+        <Pathfinding />
       </Route>
       <Route
         path="/sorting"
