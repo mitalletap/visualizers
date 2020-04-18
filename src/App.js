@@ -2,6 +2,7 @@ import './App.css';
 import 'antd/dist/antd.css';
 import React, { useParams } from 'react';
 import Pathfinding from './Pathfinding/Pathfinding'
+import DataStructures from './DataStrucutres/DataStructures'
 import { Button, Menu } from 'antd'
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
@@ -9,7 +10,7 @@ function App() {
   return (
     <React.Fragment>
       <Router>
-      <div>
+      <div className="App">
         <Menu mode="horizontal" theme={"dark"}>
           <Menu.Item>
           <Link to="/"><Button ghost> Home </Button></Link>
@@ -36,7 +37,7 @@ function App() {
             <Pathfinding />
           </Route>
           <Route path="/data-structures">
-            <h1> structures </h1>
+            <DataStructures />
           </Route>
           <Route path="/sorting">
             <h1> sorting </h1>
@@ -50,58 +51,5 @@ function App() {
   </React.Fragment>
   )
 }
-
-
-
-
-
-
-
  
 export default App;
-
-
-
-
-
-{/* <Router>
-      <div>
-        <Link to="/pathfinding"><Button> Pathfinding </Button></Link>
-        <Link to="/data-structures"><Button> Data Structures </Button></Link>
-        <Link to="/sorting"><Button> Sorting </Button></Link>
-        <Link to="/trees"><Button> Trees </Button></Link>
-        <Switch>
-        <Menu mode="horizontal">
-          <Menu.Item key="home">
-            <Route exact path="/">
-              <h1> Hello </h1>
-            </Route>
-          </Menu.Item>
-
-          <Menu.Item key="pathfinding">
-            <Route path="/pathfinding">
-              <Pathfinding />
-            </Route>
-          </Menu.Item>
-
-          <Menu.Item key="pathfinding">
-            <Route path="/data-structures">
-              <h1> structures </h1>
-            </Route>
-          </Menu.Item>
-
-          <Menu.Item key="pathfinding">
-            <Route path="/sorting">
-              <h1> sorting </h1>
-            </Route>
-          </Menu.Item>
-
-          <Menu.Item key="pathfinding">
-            <Route path="/trees">
-              <h1> trees </h1>
-            </Route>
-          </Menu.Item>
-        </Menu>
-        </Switch>
-      </div>
-    </Router> */}

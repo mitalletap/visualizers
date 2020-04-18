@@ -1,0 +1,99 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`testing pathfinding.js snapshot tests the pathfinding component 1`] = `
+Array [
+  <Modal
+    confirmLoading={false}
+    maskTransitionName="fade"
+    okType="primary"
+    onCancel={[Function]}
+    onOk={[Function]}
+    title="Welcome to the Pathfinding Visualizer!"
+    transitionName="zoom"
+    visible={true}
+    width={520}
+  >
+    <p>
+      It is the MVP of this visualizer, so try it out! I plan to incorporate more features and algorithms in the future.
+    </p>
+    <p>
+      Simply drag and drop the starting and ending nodes, select the algorithm on the left, and click "Simulate"! You can also draw on the canvas to create and destroy obstructions!
+    </p>
+  </Modal>,
+  <Layout
+    style={
+      Object {
+        "minHeight": "100vh",
+      }
+    }
+  >
+    <Layout>
+      <Sider
+        collapsed={false}
+        collapsible={true}
+        onCollapse={[Function]}
+        width="15vw"
+      >
+        <Menu
+          defaultSelectedKeys={Array []}
+          mode="inline"
+          theme="dark"
+        >
+          <Divider
+            type="horizontal"
+          />
+          <MenuItem
+            onClick={[Function]}
+          >
+             Dijkstra 
+          </MenuItem>
+          <Divider
+            type="horizontal"
+          />
+          <MenuItem
+            disabled={true}
+            onClick={[Function]}
+          >
+            <ForwardRef(ClearOutlined) />
+             
+            <span>
+               
+              Choose an Algorithm
+               
+            </span>
+          </MenuItem>
+          <MenuItem
+            disabled={false}
+            onClick={[Function]}
+          >
+            <ForwardRef(ClearOutlined) />
+             
+            <span>
+               Reset 
+            </span>
+          </MenuItem>
+          <Divider
+            type="horizontal"
+          />
+        </Menu>
+      </Sider>
+      <Content
+        style={
+          Object {
+            "paddingTop": "10px",
+          }
+        }
+      >
+        <div
+          className="grid"
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        />
+      </Content>
+    </Layout>
+  </Layout>,
+]
+`;
