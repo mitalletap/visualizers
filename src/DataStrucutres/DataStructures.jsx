@@ -133,7 +133,7 @@ class Pathfinding extends Component {
                                 <Button onClick={() => this.pushIndex( this.state.currentIndex )} disabled={(this.state.currentIndex === 0 ? true : false) || (this.state.active === false)}> Push </Button>
                                 <Button onClick={() => this.popIndex( this.state.currentIndex )} disabled={(this.state.currentIndex === value.length ? true : false) || (this.state.active === false)}> Pop </Button>
                                 <Button onClick={() => this.clearStack( )} disabled={this.state.arr.length === 0}> Clear Stack </Button>
-                                <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} defaultChecked style={{ marginLeft: "20px"}}/>
+                                {/* <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} defaultChecked style={{ marginLeft: "20px"}}/> */}
                             </div>
                         </Content>
                     </Layout>
