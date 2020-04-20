@@ -3,6 +3,7 @@ import 'antd/dist/antd.css';
 import React, { useParams } from 'react';
 import Pathfinding from './Pathfinding/Pathfinding'
 import DataStructures from './DataStrucutres/DataStructures'
+import Sorting from './Sorting/Sorting'
 import { Button, Menu } from 'antd'
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
@@ -40,7 +41,7 @@ function App() {
             <DataStructures />
           </Route>
           <Route path="/sorting">
-            <h1> sorting </h1>
+            <Sorting />
           </Route>
           <Route path="/trees">
             <h1> trees </h1>

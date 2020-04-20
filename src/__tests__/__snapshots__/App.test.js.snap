@@ -102,9 +102,7 @@ exports[`testing app.js snapshot tests the main application 1`] = `
       <Route
         path="/sorting"
       >
-        <h1>
-           sorting 
-        </h1>
+        <Sorting />
       </Route>
       <Route
         path="/trees"
