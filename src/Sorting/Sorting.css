@@ -1,0 +1,9 @@
+.container {
+}
+  
+.bar {
+width: 8px;
+display: inline-block;
+margin: 0 1px;
+background-color: red;;
+}

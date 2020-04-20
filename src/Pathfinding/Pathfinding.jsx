@@ -376,7 +376,7 @@ class Pathfinding extends Component {
         }
         return i;
     }
-b
+
     onCollapse = collapsed => {
         this.setState({ collapsed });
     };
