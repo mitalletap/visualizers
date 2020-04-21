@@ -27,7 +27,7 @@ class Sorting extends Component {
 
     clearArray() {
         var array = [];
-        for(var i = 0; i < 30; i++) {
+        for(var i = 0; i < 10; i++) {
             array.push(randomIntFromInterval(5, 800))
         }
         this.setState({ arr: array })
@@ -40,21 +40,56 @@ class Sorting extends Component {
             case "Merge":
                 // this.computeMergeSort(arr);
                 animations = mergeSortAlgo(arr);
+                this.animateMerge(animations);
                 break;
             case "Quick":
                 animations = quickSortAlgo(arr);
+                this.animateQuick(animations);
                 break;
         }
-        this.animateSorting(animations);
+        console.log(animations)
     }
 
-    // computeMergeSort() {
-    //     const { arr } = this.state;
-    //     const animations = mergeSortAlgo(arr);
-    //     this.animateSorting(animations);
-    // }
 
-    animateSorting(animations) {
+    animateQuick(animations) {
+        for (let i = 0; i < animations.length; i++) {
+            const arrayBars = document.getElementsByClassName('bar');
+            console.log(animations[i])
+            const [barOneIdx, barTwoIdx] = animations[i];
+            console.log(barOneIdx, barTwoIdx);
+            var bar1Height = arrayBars[barTwoIdx].style.height;
+            var bar2Height = arrayBars[barOneIdx].style.height;
+                setTimeout(() => {
+                    arrayBars[barOneIdx].style.height = bar1Height;
+                    arrayBars[barTwoIdx].style.height = bar2Height;
+                }, i * 1);
+
+
+
+            // const isColorChange = i % 3 !== 2;
+            // if (isColorChange) {
+            //     const [barOneIdx, barTwoIdx] = animations[i];
+            //     console.log(barOneIdx, barTwoIdx);
+            //     const barOneStyle = arrayBars[barOneIdx].style;
+            //     const barTwoStyle = arrayBars[barTwoIdx].style;
+            //     const color = i % 3 === 0 ? '#CA8677' : '#77BBCA';
+            //     setTimeout(() => {
+            //         barOneStyle.backgroundColor = color;
+            //         barTwoStyle.backgroundColor = color;
+            //     }, i * 500);
+            // } else {
+            //     setTimeout(() => {
+            //         const [barOneIdx, newHeight] = animations[i];
+            //         const barOneStyle = arrayBars[barOneIdx].style;
+            //         barOneStyle.height = `${newHeight}px`;
+            //     }, i * 500);
+            // }
+        }
+    }
+
+
+
+    animateMerge(animations) {
         for (let i = 0; i < animations.length; i++) {
             const arrayBars = document.getElementsByClassName('bar');
             const isColorChange = i % 3 !== 2;
@@ -67,13 +102,13 @@ class Sorting extends Component {
                 setTimeout(() => {
                     barOneStyle.backgroundColor = color;
                     barTwoStyle.backgroundColor = color;
-                }, i * 5);
+                }, i * 500);
             } else {
                 setTimeout(() => {
                     const [barOneIdx, newHeight] = animations[i];
                     const barOneStyle = arrayBars[barOneIdx].style;
                     barOneStyle.height = `${newHeight}px`;
-                }, i * 5);
+                }, i * 500);
             }
         }
     }

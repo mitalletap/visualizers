@@ -16,21 +16,23 @@ function quickSort(arr, low, high, animations) {
 
 }
 
+// [ 7, 46, 6, 36, 46 ]
 function partition(arr, low, high, animations) {
     var pivot = arr[high];
     var i = (low - 1);
 
-    for(var j = low; j <= high - 1; j++) {
-        if(arr[j] < pivot) {
+    for (var j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            animations.push([j, high])
             i++;
             swap(arr, i, j);
         }
     }
-    swap(arr, i+1, high);
-    animations.push([i, arr[j]])
-    return i+1;
+    swap(arr, i + 1, high);
+    return i + 1;
 
 }
+
 
 
 function swap(arr, a, b) {
